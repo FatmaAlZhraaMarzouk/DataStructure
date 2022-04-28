@@ -1,10 +1,9 @@
 /********************************************************/
 /*  AUTHOR      : Fatma AlZahraa Marzouk Gaber          */
-/*  Description : Regular Queue Array Based             */
+/*  Description : Circular Queue Array Based            */
 /*  Date        : 30/12/2021                            */
 /* Version      : V01                                   */
 /********************************************************/
-
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -59,8 +58,14 @@ void Queue_EnQueue(int Copy_QueueValue, Queue* pq ){
         if(pq->Front == -1)
         {
             pq->Front = 0;
+            pq->Rear=0;
         }
-        pq->Rear++;
+        else{
+            if(pq->Rear==MaxSize-1)
+                pq->Rear=0;
+            else
+                pq->Rear++;
+        }
         pq->Arr[pq->Rear]= Copy_QueueValue;
         pq->Size++;
     }
@@ -73,14 +78,22 @@ void Queue_DeQueue(Queue* pq,int * pd){
     else
     {
         *pd = pq->Arr[pq->Front];
-        pq->Front++;
-        pq->Size--;
-        if(pq->Front > pq->Rear)
-            pq->Front = pq->Rear = -1;  
+        if(pq->Front==pq->Rear)
+        {
+            pq->Front=-1;
+            pq->Rear=-1;
+        }
+        else{
+            if(pq->Front==MaxSize-1)
+                pq->Front=0;
+            else 
+                pq->Front++;
+
+        }  
     }
 }
 int Queue_intIsFull(Queue* pq){
-    return (pq->Rear==MaxSize-1);
+    return ((pq->Rear==MaxSize-1&&pq->Front==0)||(pq->Front==pq->Rear+1));
 }
 int Queue_intIsEmpty(Queue* pq){
     return (pq->Front==-1);
@@ -91,12 +104,25 @@ void Queue_voidPrint(Queue* pq){
         printf("The Queue is Empty\n");
     }
     else
-    {   
-        for(int i = pq->Front; i <= pq->Rear; i++)
+    {
+        int i=pq->Front;
+        if(i<=pq->Rear)
         {
-            printf("%d\n", pq->Arr[i]);
+            while (i<=pq->Rear)
+            {
+                printf("%d\n", pq->Arr[i]);
+                i++;
+            }        
+        }
+        else{
+            while (i<=MaxSize-1)
+            {
+                printf("%d\n", pq->Arr[i]);
+                i++;
+            }
         }
     }
+
 }
 int Queue_intReturnSize(Queue* pq){
     return pq->Size;

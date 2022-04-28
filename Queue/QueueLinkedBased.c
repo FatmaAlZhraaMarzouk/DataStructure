@@ -1,18 +1,21 @@
 /********************************************************/
 /*  AUTHOR      : Fatma AlZahraa Marzouk Gaber          */
-/*  Description : Regular Queue Array Based             */
+/*  Description : Regular Queue Linked Based            */
 /*  Date        : 30/12/2021                            */
 /* Version      : V01                                   */
 /********************************************************/
-
-
 #include<stdio.h>
 #include<stdlib.h>
 #define MaxSize 20
+
+typedef struct queuenode
+{
+    int Data;
+    struct queuenode * Next;
+}QueueNode;
 typedef struct queue{
-    int Arr[MaxSize];
-    int Front;
-    int Rear;
+    QueueNode* Front;
+    QueueNode* Rear;
     int Size;
 }Queue;
 
@@ -23,6 +26,7 @@ int Queue_intIsFull(Queue* pq);
 int Queue_intIsEmpty(Queue* pq);
 void Queue_voidPrint(Queue* pq);
 int Queue_intReturnSize(Queue* pq);
+void Queue_Clear(Queue* pq);
 int main(){
     Queue q1;
     int Value;
@@ -39,6 +43,7 @@ int main(){
     printf("Value = %d\n",Value);
     Queue_DeQueue(&q1,&Value);
     printf("Value = %d\n",Value);
+    Queue_Clear(&q1);
     Queue_DeQueue(&q1,&Value);
     printf("Value = %d\n",Value);
     Queue_DeQueue(&q1,&Value);
@@ -47,43 +52,51 @@ int main(){
 }
 
 void Queue_voidInit(Queue* pq){
-    pq->Front=-1;
-    pq->Rear=-1;
+    pq->Front=NULL;
+    pq->Rear=NULL;
     pq->Size=0;
 }
 void Queue_EnQueue(int Copy_QueueValue, Queue* pq ){
-    if(Queue_intIsFull(pq)){
-        printf("Queue IS Full\n");
+
+    QueueNode* pn=(QueueNode*)malloc(sizeof(QueueNode));
+    pn->Data=Copy_QueueValue;
+    pn->Next=NULL;
+    if(Queue_intIsEmpty(pq))
+    {
+        pq->Front = pn;
     }
     else{
-        if(pq->Front == -1)
-        {
-            pq->Front = 0;
-        }
-        pq->Rear++;
-        pq->Arr[pq->Rear]= Copy_QueueValue;
-        pq->Size++;
+        pq->Rear->Next=pn;
+
+
     }
+    pq->Rear=pn;
+    pq->Size++;
+    
 }
 void Queue_DeQueue(Queue* pq,int * pd){
-     if(Queue_intIsEmpty(pq))
+    if(Queue_intIsEmpty(pq))
     {
-        printf("The Queue is Empty\n");
+        printf("This is an Empty Queue\n");
     }
     else
     {
-        *pd = pq->Arr[pq->Front];
-        pq->Front++;
+        QueueNode* pn = pq->Front;
+        *pd = pn->Data;
+        pq->Front = pq->Front->Next;
+        free(pn);
+        if(Queue_intIsEmpty(pq))
+        {
+            pq->Rear = NULL;
+        }
         pq->Size--;
-        if(pq->Front > pq->Rear)
-            pq->Front = pq->Rear = -1;  
-    }
+    }  
 }
 int Queue_intIsFull(Queue* pq){
-    return (pq->Rear==MaxSize-1);
+    return 0;
 }
 int Queue_intIsEmpty(Queue* pq){
-    return (pq->Front==-1);
+    return (pq->Front==NULL);
 }
 void Queue_voidPrint(Queue* pq){
     if(Queue_intIsEmpty(pq))
@@ -91,13 +104,25 @@ void Queue_voidPrint(Queue* pq){
         printf("The Queue is Empty\n");
     }
     else
-    {   
-        for(int i = pq->Front; i <= pq->Rear; i++)
-        {
-            printf("%d\n", pq->Arr[i]);
+    { 
+       QueueNode*  pn = pq->Front;
+        while(pn!=NULL){
+            printf("The Value of Element %d\n",pn->Data);
+            pn=pn->Next;
         }
     }
 }
 int Queue_intReturnSize(Queue* pq){
     return pq->Size;
+}
+void Queue_Clear(Queue* pq){
+
+    QueueNode* pn=pq->Front;
+    while (pn!=NULL)
+    {
+        pq->Front=pq->Front->Next;
+        free(pn);
+        pq->Size--;
+        pn=pq->Front;
+    }
 }
